@@ -1,38 +1,41 @@
-<!doctype html public "-//w3c/dtd HTML 4.0//en">
-<html>
-<head><title>Calendar</title></head>
-
-<%@ page 
-        info="Calendar JSP example"
-        contentType="text/html"
-%>
-
-<jsp:useBean id="calendar" 
-  scope="page"
-  class="examples.intro.CalendarBean"
-/>
-
-
-<jsp:setProperty name="calendar"
-     property="Color" value="#FFFFCC"/>
-
-
-<h1>Today is <jsp:getProperty name="calendar" 
-  property="TodayString"/></h1>
-
-<p>
-<center>
-<jsp:getProperty name="calendar" property="HtmlMonth" />
-</center>
-
-
-
-<p>
-<hr>
-<font face="Helvetica">
-<p>This page executed by 
-<%= application.getServerInfo() %>.<br>
-Copyright 1999-2000 &copy; BEA Systems, Inc. 
-All Rights Reserved. 
-</body>
-</html>
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+ 
+public class ...Servlet extends HttpServlet {
+ 
+   // Runs when the servlet is loaded onto the server.
+   public void init() {
+      ......
+   }
+ 
+   // Runs on a thread whenever there is HTTP GET request
+   // Take 2 arguments, corresponding to HTTP request and response
+   public void doGet(HttpServletRequest request, HttpServletResponse response)
+         throws IOException, ServletException {
+ 
+      // Set the MIME type for the response message
+      response.setContentType("text/html");
+      // Write to network
+      PrintWriter out = response.getWriter();
+ 
+      // Your servlet's logic here
+      out.println("<html>");
+      out.println( ...... );
+      out.println("</html>");
+   }
+ 
+   // Runs as a thread whenever there is HTTP POST request
+   public void doPost(HttpServletRequest request, HttpServletResponse response)
+         throws IOException, ServletException {
+      // do the same thing as HTTP GET request
+      doGet(request, response);
+   }
+ 
+   // Runs when the servlet is unloaded from the server.
+   public void destroy() {
+      ......
+   }
+ 
+   // Other instance variables and methods
+ }
