@@ -1,41 +1,75 @@
-import java.io.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
+<html>
+<head>
+  <title>Book Query</title>
+</head>
+<body>
+  <h1>Another E-Bookstore</h1>
+  <h3>Choose Author(s):</h3>
+  <form method="get">
+    <input type="checkbox" name="author" value="Tan Ah Teck">Tan
+    <input type="checkbox" name="author" value="Mohd Ali">Ali
+    <input type="checkbox" name="author" value="Kumar">Kumar
+    <input type="submit" value="Query">
+  </form>
  
-public class ...Servlet extends HttpServlet {
+  <%
+    String[] authors = request.getParameterValues("author");
+    if (authors != null) {
+  %>
+  <%@ page import = "java.sql.*" %>
+  <%
+      Connection conn = DriverManager.getConnection(
+          "jdbc:mysql://localhost:8888/ebookshop", "myuser", "xxxx"); // <== Check!
+      // Connection conn =
+      //    DriverManager.getConnection("jdbc:odbc:eshopODBC");  // Access
+      Statement stmt = conn.createStatement();
  
-   // Runs when the servlet is loaded onto the server.
-   public void init() {
-      ......
-   }
+      String sqlStr = "SELECT * FROM books WHERE author IN (";
+      sqlStr += "'" + authors[0] + "'";  // First author
+      for (int i = 1; i < authors.length; ++i) {
+         sqlStr += ", '" + authors[i] + "'";  // Subsequent authors need a leading commas
+      }
+      sqlStr += ") AND qty > 0 ORDER BY author ASC, title ASC";
  
-   // Runs on a thread whenever there is HTTP GET request
-   // Take 2 arguments, corresponding to HTTP request and response
-   public void doGet(HttpServletRequest request, HttpServletResponse response)
-         throws IOException, ServletException {
- 
-      // Set the MIME type for the response message
-      response.setContentType("text/html");
-      // Write to network
-      PrintWriter out = response.getWriter();
- 
-      // Your servlet's logic here
-      out.println("<html>");
-      out.println( ...... );
-      out.println("</html>");
-   }
- 
-   // Runs as a thread whenever there is HTTP POST request
-   public void doPost(HttpServletRequest request, HttpServletResponse response)
-         throws IOException, ServletException {
-      // do the same thing as HTTP GET request
-      doGet(request, response);
-   }
- 
-   // Runs when the servlet is unloaded from the server.
-   public void destroy() {
-      ......
-   }
- 
-   // Other instance variables and methods
- }
+      // for debugging
+      System.out.println("Query statement is " + sqlStr);
+      ResultSet rset = stmt.executeQuery(sqlStr);
+  %>
+      <hr>
+      <form method="get" action="order.jsp">
+        <table border=1 cellpadding=5>
+          <tr>
+            <th>Order</th>
+            <th>Author</th>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Qty</th>
+          </tr>
+  <%
+      while (rset.next()) {
+        int id = rset.getInt("id");
+  %>
+          <tr>
+            <td><input type="checkbox" name="id" value="<%= id %>"></td>
+            <td><%= rset.getString("author") %></td>
+            <td><%= rset.getString("title") %></td>
+            <td>$<%= rset.getInt("price") %></td>
+            <td><%= rset.getInt("qty") %></td>
+          </tr>
+  <%
+      }
+  %>
+        </table>
+        <br>
+        <input type="submit" value="Order">
+        <input type="reset" value="Clear">
+      </form>
+      <a href="<%= request.getRequestURI() %>"><h3>Back</h3></a>
+  <%
+      rset.close();
+      stmt.close();
+      conn.close();
+    }
+  %>
+</body>
+</html>
