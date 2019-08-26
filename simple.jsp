@@ -1,42 +1,38 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
+<!doctype html public "-//w3c/dtd HTML 4.0//en">
 <html>
-<head>
-<title>EL Implicit Object Example</title>
-</head>
-<body>
-<h1>EL Implicit Object Examples</h1>
-<form action="formproc.jsp" method="post">
-<table>
-<tr>
- <td colspan="2"><h3>Design a Cake</h3></td>
-</tr>
-<tr>
-<td>Cake shape:</td>
-<td>
-  <select name="shape">
-     <option>round</option>
-     <option>square</option>
-     <option>heart</option>
-   </select>
-</td>
-</tr>
-<tr>
-<td valign="top">Toppings</td>
-<td>
-  <input type="checkbox" name="topping" value="choc">Chocolate</input><br/>
-  <input type="checkbox" name="topping" value="cane">Candy Cane</input><br/>
-  <input type="checkbox" name="topping" value="flower">Flower</input><br/>
-</td>
+<head><title>Calendar</title></head>
 
-</tr>
+<%@ page 
+        info="Calendar JSP example"
+        contentType="text/html"
+%>
 
-<tr>
-<td colspan="2">
-  <center><input type="submit" value="Send"/></center>
-</td>
-</tr>
-</table>
-</form>
+<jsp:useBean id="calendar" 
+  scope="page"
+  class="examples.intro.CalendarBean"
+/>
+
+
+<jsp:setProperty name="calendar"
+     property="Color" value="#FFFFCC"/>
+
+
+<h1>Today is <jsp:getProperty name="calendar" 
+  property="TodayString"/></h1>
+
+<p>
+<center>
+<jsp:getProperty name="calendar" property="HtmlMonth" />
+</center>
+
+
+
+<p>
+<hr>
+<font face="Helvetica">
+<p>This page executed by 
+<%= application.getServerInfo() %>.<br>
+Copyright 1999-2000 &copy; BEA Systems, Inc. 
+All Rights Reserved. 
 </body>
 </html>
