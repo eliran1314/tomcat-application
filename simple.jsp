@@ -1,51 +1,49 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core
+"
+         prefix="c" %>
+<%@ taglib uri="/functions" prefix="f" %>
 <html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-    <title>Insert title here</title>
-</head>
-<style>
-    div.ex {
-        text-align: right
-        width: 300px;
-        padding: 10px;
-        border: 5px solid grey;
-        margin: 0px
-    }
-</style>
-<body>
-<h1>Registration Form</h1>
-<div class="ex">
-    <form action="RegistrationController" method="post">
-        <table style="with: 50%">
-            <tr>
-                <td>Full Name</td>
-                <td><input type="text" name="fullname"/></td>
-            </tr>
-            <tr>
-                <td>Address</td>
-                <td><input type="text" name="address"/></td>
-            </tr>
-            <tr>
-                <td>Age</td>
-                <td><input type="text" name="age"/></td>
-            </tr>
-            <tr>
-                <td>Qualification</td>
-                <td><input type="text" name="qual"/></td>
-            </tr>
-            <tr>
-                <td>Percentage</td>
-                <td><input type="text" name="percent"/></td>
-            </tr>
-            <tr>
-                <td>Year Passed</td>
-                <td><input type="text" name="yop"/></td>
-            </tr>
-        </table>
-        <input type="submit" value="register"/>
-    </form>
-</div>
+<head><title>Localized Dates</title></head>
+<body bgcolor="white">
+<jsp:useBean id="locales" scope="application"
+    class="mypkg.MyLocales"/>
+
+<form name="localeForm" action="index.jsp" method="post">
+<c:set var="selectedLocaleString" value="${param.locale}" />
+<c:set var="selectedFlag"
+     value="${!empty selectedLocaleString}" />
+<b>Locale:</b>
+<select name=locale>
+<c:forEach var="localeString" items="${locales.localeNames}" >
+<c:choose>
+    <c:when test="${selectedFlag}">
+        <c:choose>
+            <c:when
+                 test="${f:equals(selectedLocaleString, localeString)}" >
+                <option selected>${localeString}</option>
+            </c:when>
+            <c:otherwise>
+                <option>${localeString}</option>
+            </c:otherwise>
+        </c:choose>
+    </c:when>
+    <c:otherwise>
+        <option>${localeString}</option>
+    </c:otherwise>
+</c:choose>
+</c:forEach>
+</select>
+<input type="submit" name="Submit" value="Get Date">
+</form>
+
+<c:if test="${selectedFlag}" >
+    <jsp:setProperty name="locales"
+        property="selectedLocaleString"
+        value="${selectedLocaleString}" />
+    <jsp:useBean id="date" class="mypkg.MyDate"/>
+    <jsp:setProperty name="date" property="locale"
+        value="${locales.selectedLocale}"/>
+    <b>Date: </b>${date.date}</c:if>
 </body>
 </html>
