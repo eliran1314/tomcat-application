@@ -1,139 +1,79 @@
-<%@ page import = "java.util.*" %><?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html 
-    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
-<head>
-    <meta http-equiv="Content-Type" content='text/html; charset=UTF-8'/>
-    <meta http-equiv="Content-Style-Type" content="text/css"/>
-    <link rel="stylesheet" media="screen" type="text/css" title="Preferred" href="number-guess.css"/>
-    <title>JSP Number Guess</title>
-</head>
-<body>
+<%@ page import="java.util.ArrayList" %>
+<%--
+  Created by IntelliJ IDEA.
+  User: yubraj
+  Date: 11/20/16
+  Time: 4:27 PM
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+  <head>
+    <title>Number Guess System</title>
+      <style>
+          .error{ color: red; }
+          .success { color: greenyellow; }
+      </style>
+  </head>
+  <body>
+    <h1>Hello world</h1>
+    <%
+        for(int i = 1; i<=10; i++){ %>
+        <h5><%= +i%></h5>
+    <% } %>
+    <h1>Number Guess System</h1>
+    <p>Guess Number within 1 and 10</p>
 
-    <h1>JSP Number Guess</h1>
+    <%
+        final HttpSession       Sess = request.getSession();
+        final boolean           JustStarted = Sess.isNew();
+        final Integer           randomNumber;
 
-    <div class='content'>
-<%
-//  Initialize.
-
-    final HttpSession       Sess = request.getSession();
-    final boolean           JustStarted = Sess.isNew();
-    final Integer           No;
-    final ArrayList         Hist;
-
-    if (JustStarted) {
-
-        No = new Integer(new java.util.Random().nextInt(101));
-        Hist = new ArrayList();
-
-        Sess.setAttribute("no", No);
-        Sess.setAttribute("hist", Hist);
-
-    } else {
-
-        No = (Integer) Sess.getAttribute("no");
-        Hist = (ArrayList) Sess.getAttribute("hist");
-    }
-
-//  Process the input.
-
-    final String            GuessStr = request.getParameter("guess");
-    String                  GuessErrorMsg = null;
-    int                     Guess = -1;
-
-    if (!JustStarted) {
-
-        if (GuessStr != null && GuessStr.length() != 0) {
-
-            try {
-
-                Guess = Integer.parseInt(GuessStr);
-                if (Guess < 0 || Guess > 100)
-                    GuessErrorMsg = "The guess must be in the range 0 to 100 (inclusive). " + 
-                        "The number \"" + Guess + "\" is not in that range.";
-                else
-                    Hist.add(new Integer(Guess));
-
-            } catch (NumberFormatException e) {
-                GuessErrorMsg = "The guess \"" + GuessStr + "\" is not a number.";
+        if(JustStarted){
+                randomNumber = new Integer(new java.util.Random().nextInt(10));
+                System.out.println("Random Number : " + randomNumber);
+                Sess.setAttribute("number", randomNumber);
+            } else {
+                randomNumber = (Integer) Sess.getAttribute("number");
             }
+    %>
 
-        } else
-            GuessErrorMsg = "The guess should be a number, but is blank.";
-    }
+    <%
+        String inputText = request.getParameter("number");
+        String errorMsg = null;
+        boolean success = false;
 
-//  Produce the dynamic portions of the web page.
-
-    if (Guess != No.intValue()) {
-%>
-        <div class='guess'>
-            <p>A random number between 0 and 100 (inclusive) has been selected.</p>
-<%
-        if (GuessErrorMsg != null) {
-%>
-            <div class='bad-field-error-message'><%= GuessErrorMsg %></div>
-<%
+        if(!JustStarted) {
+            if (inputText != null && inputText.length() > 0) {
+                int myNumber = Integer.parseInt(inputText);
+                if (randomNumber != myNumber) {
+                    if (myNumber > randomNumber)
+                        errorMsg = "Number too large!";
+                    else
+                        errorMsg = "Number too Low!";
+                } else {
+                    errorMsg = "Congrats! you win";
+                    success = true;
+                }
+            }
         }
-%>
-            <form method='post'>
-                <label <%= GuessErrorMsg != null ? "class='bad-field'" : "" %> >Guess the number: 
-                    <input type='text' size='6' name='guess' 
-                    <%= GuessErrorMsg != null ? "value='" + GuessStr + "'" : "" %> />
-                </label>
-                <input type='submit' value='Guess'/>
-            </form>
-        </div>
-<%
-    } else {
+    %>
 
-        Sess.invalidate();  //  Destroy this session. We're done.
-%>
-        <div class='done'>
-            <p>Correct! The number was <%= No %>. 
-            You guessed it in <%= Hist.size() %> attempts.</p>
-
-            <form method='post'>
-                <input type='submit' value='Play Again'/>
-            </form>
-        </div>
-<%
-    }
-
-    if (Hist.size() > 0) {
-%>
-        <div class='history'>
-            <table class='history'>
-                <thead>
-                    <tr>
-                        <th>No.</th> <th>Guess</th> <th>Result</th>
-                    </tr>
-                </thead>
-                <tbody>
-<%
-        for (int Index = Hist.size() - 1; Index >= 0; Index--) {
-            final Integer           PrevGuess = (Integer) Hist.get(Index);
-            final int               Relationship = PrevGuess.compareTo(No);
-            String                  Result = "Correct!";
-
-            if (Relationship < 0)
-                Result = "Too Low";
-            else if (Relationship > 0)
-                Result = "Too High";
-%>
-                    <tr>
-                        <td><%= Index + 1 %></td> <td><%= PrevGuess %></td> <td class='result'><%= Result %></td>
-                    </tr>
-<%
-        }
-%>
-                </tbody>
-            </table>
-        </div>
-<%
-    }
-%>
+    <div>
+        <% if(errorMsg != null){ %>
+            <p class="<% if(success){ %>
+                        success
+                       <% }else{ %>
+                        error
+                        <% } %>
+                      ">
+                <%= errorMsg %>
+            </p>
+        <% } %>
+        <form method="post">
+            <label for="number">Enter the Number : </label> <input type="tex" name="number" id="number" maxlength="3">
+            <input type="submit" value="Submit">
+        </form>
     </div>
-
-</body>
+  </body>
 </html>
