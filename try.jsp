@@ -20,7 +20,7 @@
       <%       }
       }
       if (flag) { c++; %>     
-      <h3>I Guessed a Number between 1 to 10. Try To Guesssssssssss..</h3>
+      <h3>I Guessed a Number between 1 to 10. Try To Guess..</h3>
       <form name="guess" action="try.jsp?c=<%= c%>" method="post">
       <input type="text" value="<%=num %>" name="val" hidden>
       Make Your Guess : <input type="text" name="guess" size=10 maxlength=3>
